@@ -1,7 +1,6 @@
 $(document).ready(function() {
 
 
-	//TODO: view history
 
 	//new instance of client
 	var client = new BowlingApiClient('http://bowling-api.nextcapital.com/api');
@@ -107,7 +106,7 @@ $(document).ready(function() {
 
 	//-------------------------------app-----------------------------//
 
-	//view leagues
+	
 
 	//user constructor
 	function user(userID, bowlerName, bowlerID) {
@@ -117,34 +116,22 @@ $(document).ready(function() {
 
 	}
 
+
 	$('h2').click(function() {
 		viewLeagues();
 	});
 
+	//event handler for back button and refresh button
 	function buttons() {
 		$('.btn').click(function() {
 			viewLeagues();
 		});
 	}
 		
-	
+
 
 	
-	$('#jackpot').click(function() {
-		$('#jackpot').addClass('active');
-		$('#tix').removeClass('active');
-
-		viewLeagues();
-	});
-
-	/*
-	$('#tix').click(function() {
-		$('#jackpot').removeClass('active');
-		$('#tix').addClass('active');
-
-		buyTickets();
-	});*/
-
+	//user constructor - holds user data
 	function User(userID, bowlerID, bowlerName) {
 		this.userID = userID;
 		this.bowlerID = bowlerID;
@@ -180,12 +167,16 @@ $(document).ready(function() {
 		});
 	}
 
+	//records roll in a new interface
 	function recordRoll(leagueID, lotteryID, bowlerID) {
 		console.log('new screen');
 		$('.leagues').html("");
 		$('.leagues').append("<button style = \"text-align:center\" type=\"button\" class=\"btn btn-default\" aria-label=\"Left Align\">"
 			+"<span class=\"glyphicon glyphicon-arrow-left\" aria-hidden=\"true\"></span></button><br>");
-		$('.leagues').append('<input type = "text" class = "enter-pins" placeholder = "Enter pins"><button class = "pins">');
+		$('.leagues').append('<input type = \"text\" class = \"enter-pins\" placeholder = \"Enter pins\">'
+								+'<button type = \"button\" class = \"pins\">Submit</button>');
+
+		buttons();
 		$('.pins').click(function() {
 			client.updateRoll({
 			    leagueId: leagueID,
@@ -205,6 +196,8 @@ $(document).ready(function() {
 			  });
 			});
 	}
+
+	//joins league and buys ticket
 	function buy() {
 		$('.buy').click(function() {
 			var league_id = $(this).attr("id");
@@ -230,6 +223,7 @@ $(document).ready(function() {
 		});
 	}
 
+	//view jackpot history
 	function viewHistory() {
 		$('.history').click(function() {
 			$('.leagues').html("");
@@ -241,6 +235,8 @@ $(document).ready(function() {
 		});
 	}
 
+
+	//helper function for viewHistory
 	function getHistory(leagueID) {
 		client.getLotteries({
 		    leagueId: leagueID,
@@ -259,7 +255,7 @@ $(document).ready(function() {
 		});
 	}
 
-	//
+	//attach class identifier for draw winner button
 	function getLotteryForButton(leagueID) {
 		client.getLotteries({
 		    leagueId: leagueID,
@@ -267,7 +263,7 @@ $(document).ready(function() {
 		      console.log("Lottery id for button "+leagueID+" is "+lotteries[lotteries.length-1].id);
 		      $('#'+leagueID+'.drawwinner').addClass(''+lotteries[lotteries.length-1].id); 
 		      console.log('#'+leagueID+'.drawwinner');
-		      drawWinner();
+		      
 
 		    },
 		    error: function(xhr)  {
@@ -278,6 +274,7 @@ $(document).ready(function() {
 	}
 
 	
+	//get lotteries and purhcase a ticket for most recent lottery
 	function getLotteries(bowlerID, leagueID) {
 		client.getLotteries({
 		    leagueId: leagueID,
@@ -293,6 +290,7 @@ $(document).ready(function() {
 
 	}
 
+	//buy the ticket
 	function purchaseTicket(bowlerID, leagueID, lotteryID) {
 		client.purchaseTicket({
 			bowlerId: bowlerID,
@@ -314,6 +312,7 @@ $(document).ready(function() {
 		});
 	}
 
+	//finds bowler id of logged in user
 	function processUserInfo(id) {
 		client.getBowlers({
 		    success: function(bowlers) {
@@ -340,14 +339,14 @@ $(document).ready(function() {
 		$('.leagues').append('hi');
 	}
 
-	function selectBowler() {
 
-	}
-	//show leagues + jackpot
+	//show leagues + jackpot + buttons for buying tickets/history/drawing winner
 	function viewLeagues() {
 		$('.leagues').html("");
 		$('.leagues').append("<button style = \"text-align:center\" type=\"button\" class=\"btn btn-default\" aria-label=\"Left Align\">"
 			+"<span class=\"glyphicon glyphicon-refresh\" aria-hidden=\"true\"></span></button><br>");
+
+		
 		buttons();
 		
 		client.getLeagues({
@@ -362,7 +361,7 @@ $(document).ready(function() {
 				getLotteryForButton(leagues[i].id);
 
 			  }
-
+			  drawWinner();
 			  buy();
 			  viewHistory();
 		    },
@@ -374,7 +373,7 @@ $(document).ready(function() {
 		
 	}
 
-	
+	//show current jackpot
 	function showLotteries(league_id) {
 		client.getLotteries({
 		    leagueId: league_id,
